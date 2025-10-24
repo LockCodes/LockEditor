@@ -1,6 +1,8 @@
 <def name="Basic element types definition">
 	<element name="object" friendlyname="Object" icon="client/images/icons/object.png" shortcut="model">
 		<data name="model" type="objectID" description="Object model" default="1337" />
+		<data name="customObject" type="selection:false,true" description="Custom model (dynamic allocation for LockCode)" required="false" default="false" />
+		<data name="customObjectName" type="string" description="Custom object identifier (for model linking)" required="false" default="" />
 		<data name="position" type="coord3d" description="XYZ position" default="0,0,0" />
 		<data name="rotation" type="coord3d" description="XYZ rotation" default="0,0,0" />
 		<data name="interior" type="integer" description="GTA interior world" default="0" />
