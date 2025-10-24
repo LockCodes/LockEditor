@@ -9,7 +9,7 @@
 
 **Map Editor oficial do MTA com melhorias para a comunidade de modelagem**
 
-[📖 Documentação](#sobre-o-projeto) • [🚀 Instalação](#instalação) • [🤝 Contribuindo](#contribuindo) • [💬 Suporte](https://discord.gg/LockCode)
+[📖 Documentação](#-sobre-o-projeto) • [🚀 Instalação](#-instalação) • [🤝 Contribuindo](#-contribuindo) • [💬 Suporte](https://discord.gg/LockCode)
 
 </div>
 
