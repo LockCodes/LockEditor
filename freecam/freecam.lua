@@ -26,6 +26,13 @@ local options = {
 	key_left_veh = "vehicle_left",
 	key_right_veh = "vehicle_right",
 	fov = 70,
+	debugEnabled = false,
+	debugShowObjectId = true,
+	debugShowObjectName = true,
+	debugShowObjectDistance = true,
+	debugDrawDistance = 100,
+	debugMinTextScale = 0.5,
+	debugMaxTextScale = 1.5,
 }
 
 local controlToKey = {
@@ -267,6 +274,87 @@ local function freecamMouse(cX, cY, aX, aY)
 	end
 end
 
+local function debugRender()
+	if not options.debugEnabled then
+		return
+	end
+
+	local camX, camY, camZ = getCameraMatrix()
+	local maxDist = options.debugDrawDistance
+
+	for _, element in ipairs(getElementsByType("object", root, true)) do
+		local objX, objY, objZ = getElementPosition(element)
+		local distance = getDistanceBetweenPoints3D(camX, camY, camZ, objX, objY, objZ)
+
+		if distance <= maxDist then
+			local screenX, screenY = getScreenFromWorldPosition(objX, objY, objZ + 0.5, 0.1, true)
+
+			if screenX and screenY then
+				local distanceFactor = 1 - (distance / maxDist)
+				local scale = options.debugMinTextScale
+					+ (distanceFactor * (options.debugMaxTextScale - options.debugMinTextScale))
+
+				local infoLines = {}
+				local lineHeight = 15 * scale
+
+				if options.debugShowObjectId then
+					local modelId = getElementModel(element)
+					table.insert(infoLines, "ID: " .. tostring(modelId))
+				end
+
+				if options.debugShowObjectName then
+					local modelId = getElementModel(element)
+					local modelName = engineGetModelNameFromID(modelId) or "Unknown"
+					table.insert(infoLines, "Name: " .. modelName)
+				end
+
+				if options.debugShowObjectDistance then
+					table.insert(infoLines, string.format("Dist: %.1fm", distance))
+				end
+
+				local totalHeight = #infoLines * lineHeight
+				local startY = screenY - (totalHeight / 2)
+
+				local alpha = math.floor(255 * distanceFactor)
+
+				for i, line in ipairs(infoLines) do
+					local yPos = startY + ((i - 1) * lineHeight)
+					dxDrawText(
+						line,
+						screenX + 1,
+						yPos + 1,
+						screenX + 1,
+						yPos + 1,
+						tocolor(0, 0, 0, alpha),
+						scale,
+						"default-bold",
+						"center",
+						"center",
+						false,
+						false,
+						false
+					)
+					dxDrawText(
+						line,
+						screenX,
+						yPos,
+						screenX,
+						yPos,
+						tocolor(255, 255, 255, alpha),
+						scale,
+						"default-bold",
+						"center",
+						"center",
+						false,
+						false,
+						false
+					)
+				end
+			end
+		end
+	end
+end
+
 -- PUBLIC
 
 function getFreecamVelocity()
@@ -285,6 +373,7 @@ function setFreecamEnabled(x, y, z)
 	rotX, rotY = 0, 0
 	addEventHandler("onClientRender", root, freecamFrame)
 	addEventHandler("onClientCursorMove", root, freecamMouse)
+	addEventHandler("onClientRender", root, debugRender)
 	setElementData(localPlayer, "freecam:state", true)
 
 	return true
@@ -302,6 +391,7 @@ function setFreecamDisabled()
 	rotX, rotY = 0, 0
 	removeEventHandler("onClientRender", root, freecamFrame)
 	removeEventHandler("onClientCursorMove", root, freecamMouse)
+	removeEventHandler("onClientRender", root, debugRender)
 	setElementData(localPlayer, "freecam:state", false)
 
 	return true
