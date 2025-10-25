@@ -681,9 +681,13 @@ function edfCloneElement(theElement, editorMode )
 
 	if isBasic[elementType] then
 		for property, propertyData in pairs(edf[creatorResource]["elements"][elementType].data) do
-			--try to get the given value in target datatype
-			if convert[propertyData.datatype] then
-				parametersTable[property] = convert[propertyData.datatype](parametersTable[property])
+			local propertyValue = getElementData(theElement, property)
+			if propertyValue ~= nil then
+				if convert[propertyData.datatype] then
+					parametersTable[property] = convert[propertyData.datatype](propertyValue)
+				else
+					parametersTable[property] = propertyValue
+				end
 			end
 		end
 
@@ -702,6 +706,12 @@ function edfCloneElement(theElement, editorMode )
 		end
 		if getElementType(oldElement) == "vehicle" then
 			setVehiclePaintjob(theElement, getVehiclePaintjob(oldElement))
+		end
+
+		for property, value in pairs(parametersTable) do
+			if property ~= "position" and property ~= "rotation" and property ~= "scale" and property ~= "interior" and property ~= "dimension" and property ~= "alpha" then
+				setElementData(theElement, property, value)
+			end
 		end
 
 		setElementInterior(theElement, parametersTable.interior)
